@@ -86,10 +86,10 @@ def get_host_keys_settings(options):
         filename = options.syshostfile
     system_host_keys = load_host_keys(filename)
     
-    if not options.certs_home:
-        certs_home=static_certs=os.path.join(base_dir, 'webssh', 'certs')
+    if not options.certs:
+        certs_home=os.path.join(base_dir, 'webssh', 'certs')
     else:
-        certs_home = options.certs_home
+        certs_home = options.certs
     settings = dict(
         host_keys=host_keys,
         system_host_keys=system_host_keys,
