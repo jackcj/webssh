@@ -480,15 +480,17 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
             # for testing purpose only
             raise ValueError('Uncaught exception')
 
+        now = (int(time.time()))
+
         ip, port = self.get_client_addr()
         workers = clients.get(ip, {})
-        logging.info('Client>>>> on {}:{}'.format(ip, port))
+        logging.info('Client>>>> on {}:{} now time {}'.format(ip, port,now))
 
         client_ip = self.get_value("ip")
         if client_ip != ip:
             raise tornado.web.HTTPError(403, 'IP in blacklist.')
 
-        now = (int(time.time()))
+        
         tm = (int(self.get_value("tm")))
         if now - tm > 30*60:
             raise tornado.web.HTTPError(403, 'connect timeout.')

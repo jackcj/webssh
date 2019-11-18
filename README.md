@@ -121,9 +121,9 @@ Custom font family usage example:
 
 Support passing arguments by url (query or fragment) like following examples:
 
-Passing form data (password must be encoded in base64, privatekey not supported)
+Passing form data (password must be encoded in base64, privatekey supported, must create dir 'certs' and copy rsakey)
 ```bash
-http://localhost:8888/?hostname=xx&username=yy&password=str_base64_encoded
+http://localhost:8888/?hostname=xx&username=yy&password=str_base64_encoded&rsakey=filename
 ```
 
 Passing a terminal background color
