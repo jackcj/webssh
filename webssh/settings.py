@@ -45,7 +45,7 @@ define('maxconn', type=int, default=20,
        help='Maximum live connections (ssh sessions) per client')
 define('version', type=bool, help='Show version information',
        callback=print_version)
-
+define('certs', default='', help='SSL certificate file dir')
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 max_body_size = 1 * 1024 * 1024
@@ -55,6 +55,7 @@ def get_app_settings(options):
     settings = dict(
         template_path=os.path.join(base_dir, 'webssh', 'templates'),
         static_path=os.path.join(base_dir, 'webssh', 'static'),
+        static_certs=os.path.join(base_dir, 'webssh', 'certs'),
         websocket_ping_interval=options.wpintvl,
         debug=options.debug,
         xsrf_cookies=options.xsrf,
@@ -84,11 +85,13 @@ def get_host_keys_settings(options):
     else:
         filename = options.syshostfile
     system_host_keys = load_host_keys(filename)
-
+    
+    certs_home=static_certs=os.path.join(base_dir, 'webssh', 'certs')
     settings = dict(
         host_keys=host_keys,
         system_host_keys=system_host_keys,
-        host_keys_filename=host_keys_filename
+        host_keys_filename=host_keys_filename,
+        certs_home=certs_home
     )
     return settings
 

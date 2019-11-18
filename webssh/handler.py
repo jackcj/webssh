@@ -371,7 +371,10 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
         hostname = self.get_hostname()
         port = self.get_port()
         username = self.get_value('username')
+        rsakey = self.get_value("rsakey")
+
         password = self.get_argument('password', u'')
+
         privatekey, filename = self.get_privatekey()
         passphrase = self.get_argument('passphrase', u'')
         totp = self.get_argument('totp', u'')
@@ -382,7 +385,16 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
         if privatekey:
             pkey = PrivateKey(privatekey, passphrase, filename).get_pkey_obj()
         else:
-            pkey = None
+            if rsakey:
+                with open(os.path.join(host_keys_settings["certs_home"], rsakey), encoding='utf-8') as file_obj:
+                    privatekey = file_obj.read()
+                if privatekey:
+                    pkey = PrivateKey(privatekey, passphrase, rsakey).get_pkey_obj()
+                else:
+                    pkey = None
+            else:
+                pkey = None
+
 
         self.ssh_client.totp = totp
         args = (hostname, port, username, password, pkey)
