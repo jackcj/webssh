@@ -8,6 +8,8 @@ import weakref
 import paramiko
 import tornado.web
 import os.path
+import time
+import datetime
 
 from concurrent.futures import ThreadPoolExecutor
 from tornado.ioloop import IOLoop
@@ -480,10 +482,24 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
 
         ip, port = self.get_client_addr()
         workers = clients.get(ip, {})
+        logging.info('Client>>>> on {}:{}'.format(ip, port))
+
+        client_ip = self.get_value("ip")
+        if client_ip != ip:
+            raise tornado.web.HTTPError(403, 'IP in blacklist.')
+
+        now = (int(time.time()))
+        tm = (int(self.get_value("tm")))
+        if now - tm > 30*60:
+            raise tornado.web.HTTPError(403, 'connect timeout.')
+        if now < tm:
+            raise tornado.web.HTTPError(403, 'invalid time.')
+
         if workers and len(workers) >= options.maxconn:
             raise tornado.web.HTTPError(403, 'Too many live connections.')
 
         self.check_origin()
+
 
         try:
             args = self.get_args()
