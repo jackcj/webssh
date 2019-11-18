@@ -387,7 +387,7 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
             pkey = PrivateKey(privatekey, passphrase, filename).get_pkey_obj()
         else:
             if rsakey:
-                with open(os.path.join(self.host_keys_settings["certs_home"], rsakey), encoding='utf-8') as file_obj:
+                with open(os.path.join(self.host_keys_settings["certs_home"], rsakey)) as file_obj:
                     privatekey = file_obj.read()
                 if privatekey:
                     pkey = PrivateKey(privatekey, passphrase, rsakey).get_pkey_obj()
