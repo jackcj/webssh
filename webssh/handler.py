@@ -286,6 +286,12 @@ class MixinHandler(object):
 
         return (ip, port)
 
+    def get_x_real_ip(self):
+        ip = self.request.headers.get('X-Real-Ip')
+        if len(ip) == 0:
+            ip = self.request.headers.get('X-Forwarded-For', '')
+        return ip
+
 
 class NotFoundHandler(MixinHandler, tornado.web.ErrorHandler):
 
@@ -484,10 +490,12 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
 
         ip, port = self.get_client_addr()
         workers = clients.get(ip, {})
-        logging.info('Client>>>> on {}:{} now time {}'.format(ip, port,now))
 
+        x_real_ip = self.get_x_real_ip()
         client_ip = self.get_value("ip")
-        if client_ip != ip:
+        
+        logging.info('Client>>>> on {}:{} now time {}'.format(x_real_ip, port,now))
+        if client_ip != x_real_ip:
             raise tornado.web.HTTPError(403, 'IP in blacklist.')
 
         
