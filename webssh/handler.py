@@ -290,6 +290,8 @@ class MixinHandler(object):
         ip = self.request.headers.get('X-Real-Ip')
         if len(ip) == 0:
             ip = self.request.headers.get('X-Forwarded-For', '')
+            if len(ip) == 0:
+                return self.get_client_addr()
         return ip
 
 
