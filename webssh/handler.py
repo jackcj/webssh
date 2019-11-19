@@ -515,10 +515,10 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
         
         logging.info('Client>>>> on {}:{} now time {}'.format(x_real_ip, port,now))
 
-        if check_remote_ip_trusted(x_real_ip):
+        if self.check_remote_ip_trusted(x_real_ip):
             logging.info('Client {}:{} in trusted list; now time {}'.format(x_real_ip, port,now))
         else:
-            if check_remote_ip_blacklist(x_real_ip):
+            if self.check_remote_ip_blacklist(x_real_ip):
                 raise tornado.web.HTTPError(403, 'IP in blacklist.')
 
             if client_ip != x_real_ip:
