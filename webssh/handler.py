@@ -377,6 +377,23 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
                         403, 'Connection to {}:{} is not allowed.'.format(
                             hostname, port)
                     )
+    def check_remote_ip_trusted(self,remote_ip):
+        try:
+            for i in range(len(self.host_keys_settings["ip_trusted_list"])):
+                if self.host_keys_settings["ip_trusted_list"][i]==remote_ip:
+                    return True
+        except:
+            return False
+        return False
+    
+    def check_remote_ip_blacklist(self,remote_ip):
+        try:
+            for i in range(len(self.host_keys_settings["ip_black_list"])):
+                if self.host_keys_settings["ip_black_list"][i]==remote_ip:
+                    return True
+        except:
+            return False
+        return False
 
     def get_args(self):
         hostname = self.get_hostname()
@@ -497,15 +514,22 @@ class IndexHandler(MixinHandler, tornado.web.RequestHandler):
         client_ip = self.get_value("ip")
         
         logging.info('Client>>>> on {}:{} now time {}'.format(x_real_ip, port,now))
-        if client_ip != x_real_ip:
-            raise tornado.web.HTTPError(403, 'IP in blacklist.')
+
+        if check_remote_ip_trusted(x_real_ip):
+            logging.info('Client {}:{} in trusted list; now time {}'.format(x_real_ip, port,now))
+        else:
+            if check_remote_ip_blacklist(x_real_ip):
+                raise tornado.web.HTTPError(403, 'IP in blacklist.')
+
+            if client_ip != x_real_ip:
+                raise tornado.web.HTTPError(403, 'IP fake.')
 
         
-        tm = (int(self.get_value("tm")))
-        if now - tm > 30*60:
-            raise tornado.web.HTTPError(403, 'connect timeout.')
-        if now < tm:
-            raise tornado.web.HTTPError(403, 'invalid time.')
+            tm = (int(self.get_value("tm")))
+            if now - tm > 30*60:
+                raise tornado.web.HTTPError(403, 'connect timeout.')
+            if now < tm:
+                raise tornado.web.HTTPError(403, 'invalid time.')
 
         if workers and len(workers) >= options.maxconn:
             raise tornado.web.HTTPError(403, 'Too many live connections.')

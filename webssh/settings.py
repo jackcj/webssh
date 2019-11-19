@@ -90,11 +90,24 @@ def get_host_keys_settings(options):
         certs_home=os.path.join(base_dir, 'webssh', 'certs')
     else:
         certs_home = options.certs
+
+    ip_trusted_list=[]
+    ip_black_list=[]
+    for line in open(os.path.join(certs_home, "ip_trusted.conf")):
+        list = line.split('=')
+        if len(list) == 2:
+            if list[1].strip() == '0':
+                ip_black_list.append(list[0].strip())
+            else:
+                ip_trusted_list.append(list[0].strip())
+
     settings = dict(
         host_keys=host_keys,
         system_host_keys=system_host_keys,
         host_keys_filename=host_keys_filename,
-        certs_home=certs_home
+        certs_home=certs_home,
+        ip_trusted_list=ip_trusted_list,
+        ip_black_list=ip_black_list    
     )
     return settings
 
